@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown, GraduationCap } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { navigation } from '../data/navigation';
 import ThemeToggle from './ThemeToggle';
@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const location = useLocation();
+  const _location = useLocation(); // Keeping for potential future use
   const { isAuthenticated } = useAuth();
 
   const toggleMenu = () => {

@@ -6,7 +6,7 @@ import {
   Rocket, 
   BookOpen, 
   Users, 
-  Handshake, 
+  Building2, 
   FileText, 
   Settings, 
   LogOut, 
@@ -48,7 +48,7 @@ const AdminLayout: React.FC = () => {
     { path: '/admin/startups', name: 'Startups', icon: <Rocket className="h-5 w-5" /> },
     { path: '/admin/resources', name: 'Resources', icon: <BookOpen className="h-5 w-5" /> },
     { path: '/admin/team', name: 'Team', icon: <Users className="h-5 w-5" /> },
-    { path: '/admin/partners', name: 'Partners', icon: <Handshake className="h-5 w-5" /> },
+    { path: '/admin/partners', name: 'Partners', icon: <Building2 className="h-5 w-5" /> },
     { path: '/admin/pages', name: 'Pages', icon: <FileText className="h-5 w-5" /> },
     { path: '/admin/settings', name: 'Settings', icon: <Settings className="h-5 w-5" /> },
   ];

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Users, Calendar, Lightbulb, BookOpen, Zap, Award, Globe } from 'lucide-react';
+import { ArrowRight, Users, Calendar, Lightbulb, BookOpen, Zap, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Hero from '../components/Hero';
 import SectionHeading from '../components/SectionHeading';
 import EventCard from '../components/EventCard';
 import StartupCard from '../components/StartupCard';
@@ -13,8 +12,6 @@ import AnimatedCounter from '../components/AnimatedCounter';
 import TestimonialSlider from '../components/TestimonialSlider';
 import AnimatedSection from '../components/AnimatedSection';
 import ParticleBackground from '../components/ParticleBackground';
-import FloatingContent from '../components/FloatingContent';
-import VideoBackground from '../components/VideoBackground';
 import { events } from '../data/events';
 import { startups } from '../data/startups';
 import { partners } from '../data/partners';
@@ -50,9 +47,8 @@ const HomePage: React.FC = () => {
               transition={{ duration: 1 }}
             >
               <div className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">
-                <div className="block whitespace-nowrap">Wharton Alumni AI Studio and Research Center</div>
-                <div className="block whitespace-nowrap">Affinity Group</div>
-                <div className="block whitespace-nowrap">AI Studio</div>
+                <div className="block whitespace-nowrap">Wharton Alumni AI Studio</div>
+                <div className="block whitespace-nowrap">and Research Center</div>
               </div>
               
               <motion.div
