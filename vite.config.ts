@@ -7,4 +7,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  base: '/waais-v2/',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+  },
 });
