@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_DB: waais_db
+      POSTGRES_USER: waais_user
+      POSTGRES_PASSWORD: waais_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U waais_user -d waais_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://waais_user:waais_password@postgres:5432/waais_db
+      NODE_ENV: development
+      JWT_SECRET: dev-secret-key-change-in-production
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      SENDGRID_FROM_EMAIL: ${SENDGRID_FROM_EMAIL}
+      CORS_ORIGIN: http://localhost:5174
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    command: npm run dev
+
+volumes:
+  postgres_data:

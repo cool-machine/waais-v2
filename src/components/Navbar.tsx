@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, User, LogOut, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { navigation } from '../data/navigation';
 import ThemeToggle from './ThemeToggle';
-import { useAuth } from '../admin/context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const _location = useLocation(); // Keeping for potential future use
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -24,6 +25,7 @@ const Navbar: React.FC = () => {
   const closeMenu = () => {
     setIsOpen(false);
     setOpenSubmenu(null);
+    setUserMenuOpen(false);
   };
 
   const handleCommunityClick = (e: React.MouseEvent, item: any) => {
@@ -141,6 +143,91 @@ const Navbar: React.FC = () => {
                 )}
               </div>
             ))}
+            
+            {/* Auth buttons */}
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center space-x-2 text-neutral-dark dark:text-white hover:text-primary dark:hover:text-primary"
+                >
+                  {user?.profile?.profileImageUrl ? (
+                    <img 
+                      src={user.profile.profileImageUrl} 
+                      alt={`${user.firstName} ${user.lastName}`}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center">
+                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                    </div>
+                  )}
+                  <span className="hidden lg:block">{user?.firstName}</span>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50"
+                    >
+                      <div className="px-4 py-2 border-b dark:border-gray-700">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {user?.firstName} {user?.lastName}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={closeMenu}
+                      >
+                        <User className="mr-3 h-4 w-4" />
+                        Profile
+                      </Link>
+                      <Link
+                        to="/dashboard"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={closeMenu}
+                      >
+                        <Settings className="mr-3 h-4 w-4" />
+                        Dashboard
+                      </Link>
+                      <button
+                        onClick={() => {
+                          logout();
+                          closeMenu();
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        <LogOut className="mr-3 h-4 w-4" />
+                        Sign out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <Link
+                  to="/login"
+                  className="text-neutral-dark dark:text-white hover:text-primary dark:hover:text-primary"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
+                >
+                  Join WAAIS
+                </Link>
+              </div>
+            )}
+            
             <ThemeToggle />
           </nav>
 
@@ -240,6 +327,76 @@ const Navbar: React.FC = () => {
                   )}
                 </div>
               ))}
+              
+              {/* Mobile Auth buttons */}
+              <div className="border-t dark:border-gray-700 pt-4 mt-4">
+                {isAuthenticated ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-3 py-2">
+                      {user?.profile?.profileImageUrl ? (
+                        <img 
+                          src={user.profile.profileImageUrl} 
+                          alt={`${user.firstName} ${user.lastName}`}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center">
+                          {user?.firstName?.[0]}{user?.lastName?.[0]}
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {user?.firstName} {user?.lastName}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
+                      </div>
+                    </div>
+                    <Link
+                      to="/profile"
+                      className="flex items-center py-2 text-neutral-dark dark:text-gray-300"
+                      onClick={closeMenu}
+                    >
+                      <User className="mr-3 h-5 w-5" />
+                      Profile
+                    </Link>
+                    <Link
+                      to="/dashboard"
+                      className="flex items-center py-2 text-neutral-dark dark:text-gray-300"
+                      onClick={closeMenu}
+                    >
+                      <Settings className="mr-3 h-5 w-5" />
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        closeMenu();
+                      }}
+                      className="flex items-center w-full py-2 text-neutral-dark dark:text-gray-300"
+                    >
+                      <LogOut className="mr-3 h-5 w-5" />
+                      Sign out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Link
+                      to="/login"
+                      className="block py-2 text-neutral-dark dark:text-gray-300"
+                      onClick={closeMenu}
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="block py-2 px-4 bg-primary text-white rounded-md text-center"
+                      onClick={closeMenu}
+                    >
+                      Join WAAIS
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

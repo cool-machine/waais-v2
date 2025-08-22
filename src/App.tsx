@@ -17,8 +17,10 @@ import GiveBackProgramPage from './pages/GiveBackProgramPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import CookiePolicyPage from './pages/CookiePolicyPage';
 import GDPRRequestPage from './pages/GDPRRequestPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import AdminLogin from './admin/pages/AdminLogin';
-import { AuthProvider } from './admin/context/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
   return (
@@ -40,6 +42,8 @@ function App() {
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/cookie-policy" element={<CookiePolicyPage />} />
             <Route path="/gdpr-request" element={<GDPRRequestPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
             <Route path="/admin/login" element={<AdminLogin />} />
           </Routes>
         </main>

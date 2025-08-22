@@ -1,0 +1,269 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  firstName   String
+  lastName    String
+  password    String
+  role        Role     @default(ALUMNI)
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Profile information
+  profile     UserProfile?
+  
+  // Relationships
+  eventsCreated     Event[]           @relation("EventCreator")
+  eventRegistrations EventRegistration[]
+  mentorships       Mentorship[]      @relation("Mentor")
+  mentorshipRequests MentorshipRequest[] @relation("Mentee")
+  startupApplications StartupApplication[]
+  newsletterSubscriptions NewsletterSubscription[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  bio             String?
+  phone           String?
+  linkedinUrl     String?
+  twitterUrl      String?
+  website         String?
+  profileImageUrl String?
+  
+  // Wharton specific
+  graduationYear  Int?
+  degree          String?   // MBA, PhD, etc.
+  industry        String?
+  currentCompany  String?
+  currentRole     String?
+  location        String?
+  
+  // AI/ML specific
+  aiExpertise     String[]  // Machine Learning, NLP, Computer Vision, etc.
+  yearsOfExperience Int?
+  
+  // Preferences
+  availableForMentoring Boolean @default(false)
+  interestedInStartups  Boolean @default(false)
+  eventNotifications    Boolean @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("user_profiles")
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  content     String?
+  imageUrl    String?
+  
+  startDate   DateTime
+  endDate     DateTime?
+  location    String?
+  isVirtual   Boolean  @default(false)
+  meetingUrl  String?
+  
+  maxAttendees Int?
+  isPaid      Boolean  @default(false)
+  price       Float?
+  
+  status      EventStatus @default(DRAFT)
+  createdById String
+  createdBy   User     @relation("EventCreator", fields: [createdById], references: [id])
+  
+  registrations EventRegistration[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("events")
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  status    RegistrationStatus @default(REGISTERED)
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+  @@map("event_registrations")
+}
+
+model Startup {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  website     String?
+  logoUrl     String?
+  industry    String
+  stage       StartupStage
+  
+  foundedYear Int?
+  location    String?
+  teamSize    String?
+  
+  // AI/ML focus
+  aiTechnologies String[] // NLP, Computer Vision, etc.
+  
+  status      StartupStatus @default(ACTIVE)
+  
+  applications StartupApplication[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("startups")
+}
+
+model StartupApplication {
+  id        String   @id @default(cuid())
+  startupId String
+  startup   Startup  @relation(fields: [startupId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  message   String
+  status    ApplicationStatus @default(PENDING)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([startupId, userId])
+  @@map("startup_applications")
+}
+
+model Mentorship {
+  id       String @id @default(cuid())
+  mentorId String
+  mentor   User   @relation("Mentor", fields: [mentorId], references: [id], onDelete: Cascade)
+  
+  title       String
+  description String
+  expertise   String[] // Areas of expertise
+  
+  isActive    Boolean @default(true)
+  maxMentees  Int     @default(5)
+  
+  requests    MentorshipRequest[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("mentorships")
+}
+
+model MentorshipRequest {
+  id           String @id @default(cuid())
+  mentorshipId String
+  mentorship   Mentorship @relation(fields: [mentorshipId], references: [id], onDelete: Cascade)
+  menteeId     String
+  mentee       User   @relation("Mentee", fields: [menteeId], references: [id], onDelete: Cascade)
+  
+  message      String
+  status       MentorshipStatus @default(PENDING)
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([mentorshipId, menteeId])
+  @@map("mentorship_requests")
+}
+
+model NewsletterSubscription {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email     String   @unique
+  
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("newsletter_subscriptions")
+}
+
+model Partner {
+  id          String @id @default(cuid())
+  name        String
+  description String
+  website     String?
+  logoUrl     String?
+  
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("partners")
+}
+
+// Enums
+enum Role {
+  ADMIN
+  ALUMNI
+  GUEST
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  ATTENDED
+  NO_SHOW
+  CANCELLED
+}
+
+enum StartupStage {
+  IDEA
+  PRE_SEED
+  SEED
+  SERIES_A
+  SERIES_B
+  GROWTH
+}
+
+enum StartupStatus {
+  ACTIVE
+  INACTIVE
+  GRADUATED
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MentorshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
